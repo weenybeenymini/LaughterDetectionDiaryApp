@@ -5,9 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.Constraints;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -15,7 +12,8 @@ import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.PowerManager;
 import android.util.Log;
-import android.view.Window;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,8 +43,10 @@ public class MainActivity extends AppCompatActivity
     MaterialCalendarView widget;
     TextView textView;
     RecyclerView recyclerView;
+    Switch switchView;
 
     private Intent serviceIntent;
+    private boolean isActivate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +58,28 @@ public class MainActivity extends AppCompatActivity
         widget = (MaterialCalendarView)findViewById(R.id.calendarView);
         textView = (TextView)findViewById(R.id.textView);
         recyclerView =(RecyclerView) findViewById(R.id.recyclerView);
+        switchView =(Switch) findViewById(R.id.activation_switch);
 
+        //서비스 제공 유무 판단
+        switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isActivate = isChecked;
+                if (isActivate == true){
+                    Toast.makeText(MainActivity.this, "켜짐", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this, "꺼짐", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //달력처리
         widget.setOnDateChangedListener(this);
         widget.setOnMonthChangedListener(this);
 
-        //Setup initial text
         textView.setText("No Selection");
 
+        //파일 리사이클러뷰 처리
         recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -83,8 +98,8 @@ public class MainActivity extends AppCompatActivity
         mFileViewerAdapter = new FileViewerAdapter(this, llm);
         recyclerView.setAdapter(mFileViewerAdapter);
 
-        //TODO: background process
-
+        //백그라운드 서비스 처리
+        /*
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
         boolean isWhiteListing = false;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -103,18 +118,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             serviceIntent = RealService.serviceIntent;//getInstance().getApplication();
             Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
-        }
-
-        //recordWorkManage();
-        /*
-        WorkManager.getInstance().enqueue(OneTimeWorkRequest.Builder(SimpleWorker::class.java).build())
-        /*
-        val request = PeriodicWorkRequest.Builder(SimplePeriodicWorker::class.java,
-      1, TimeUnit.HOURS,
-      10, TimeUnit.MINUTES)
-      .build()
-WorkManager.getInstance().enqueue(request)
-         */
+        }*/
     }
 
     @Override
@@ -160,20 +164,4 @@ WorkManager.getInstance().enqueue(request)
                     }
                 }
             };
-
-    public void recordWorkManage(){
-        Constraints myConstraints = new Constraints.Builder()
-                .setRequiresDeviceIdle(true)
-                .build();
-
-        PeriodicWorkRequest.Builder recordBuilder =
-                new PeriodicWorkRequest.Builder(RecordingWorker.class, 3,
-                        TimeUnit.SECONDS);
-        // 원하면 제약조건을 빌더에서 적용해도 된다
-        // 실제 작업 객체를 만들자:
-        PeriodicWorkRequest recordWork = recordBuilder.build();
-        // 그런다음 반복작업으로 등록하자:
-        //이거 실행할라고 시도
-        WorkManager.getInstance().enqueue(recordWork);
-    }
 }

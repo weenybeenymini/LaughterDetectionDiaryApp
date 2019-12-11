@@ -40,7 +40,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/setting_btn"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:track="@drawable/switch_track_selector"
+            />
     </RelativeLayout>
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
