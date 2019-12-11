@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
 
     private Intent serviceIntent;
     private boolean isActivate;
+    private boolean isSettingAct = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+                isSettingAct = true;
+                Log.d("나", "true");
                 startActivity(intent);//액티비티 띄우기
             }
         });
@@ -143,20 +146,36 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        isSettingAct = false;
+        Log.d("나", "false");
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
-        if (isActivate){
-            if (RealService.serviceIntent==null) {
-                serviceIntent = new Intent(this, RealService.class);
-                serviceIntent.putExtra("isActive", isActivate);
-                startService(serviceIntent);
-            } else {
-                serviceIntent = RealService.serviceIntent;//getInstance().getApplication();
-                Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
-            }
+        if (isSettingAct){
+            Log.d("나", "세팅페이지간거구나");
         }else{
-            android.os.Process.killProcess(android.os.Process.myPid());
+            if (isActivate){
+                if (RealService.serviceIntent==null) {
+                    serviceIntent = new Intent(this, RealService.class);
+                    serviceIntent.putExtra("isActive", isActivate);
+                    startService(serviceIntent);
+                } else {
+                    serviceIntent = RealService.serviceIntent;//getInstance().getApplication();
+                    Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
+                }
+            }else{
+                SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putBoolean("isActive", isActivate);
+                editor.commit();
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
         }
     }
 

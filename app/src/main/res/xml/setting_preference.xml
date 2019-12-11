@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="상세 설정 페이지" android:textSize ="24dp" >
+
+        <PreferenceScreen
+            android:key="keyword_screen"
+            android:title="활성화 시간 설정"
+            android:summary="10:00 AM ~ 11:00 PM">
+
+            <ListPreference
+                android:entries="@array/array_setting"
+                android:entryValues="@array/array_setting"
+                android:key="keyword_sound_list"
+                android:summary="아침"
+                android:title="원하는 시간대를 선택하세요"
+                />
+
+            <Preference
+                android:title="상세 시간 설정" ></Preference>
+
+
+        </PreferenceScreen>
+
+        <CheckBoxPreference
+            android:title="이런식으로"
+            />
+        <EditTextPreference
+            android:title="쓸 수"
+            android:defaultValue="이민희"
+            android:key="backup"/>
+        <SwitchPreference
+            android:title="있겠구나"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
