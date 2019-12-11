@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.FileObserver;
@@ -18,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.laughterdetectiondiaryapp.R;
-import com.example.laughterdetectiondiaryapp.RecordingWorker;
 import com.example.laughterdetectiondiaryapp.adapters.FileViewerAdapter;
 import com.example.laughterdetectiondiaryapp.background.RealService;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -27,8 +28,6 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
 import org.threeten.bp.format.DateTimeFormatter;
-
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements OnDateSelectedListener, OnMonthChangedListener{
@@ -46,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     Switch switchView;
 
     private Intent serviceIntent;
-    private boolean isActivate = false;
+    private boolean isActivate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +58,32 @@ public class MainActivity extends AppCompatActivity
         textView = (TextView)findViewById(R.id.textView);
         recyclerView =(RecyclerView) findViewById(R.id.recyclerView);
         switchView =(Switch) findViewById(R.id.activation_switch);
+
+        //달력처리
+        widget.setOnDateChangedListener(this);
+        widget.setOnMonthChangedListener(this);
+
+        textView.setText("No Selection");
+
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+        boolean isWhiteListing = false;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            isWhiteListing = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+        }
+        if (!isWhiteListing) {
+            Intent intent = new Intent();
+            intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
+            startActivity(intent);
+        }
+
+        // 저장된 스위치 상태 불러오고 뷰 바꿔주고 그에 맞는 함수 실행
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        isActivate = pref.getBoolean("isActive", false);
+
+        if (isActivate){
+            switchView.setChecked(isActivate);
+        }
 
         //서비스 제공 유무 판단
         switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -73,30 +98,11 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        //달력처리
-        widget.setOnDateChangedListener(this);
-        widget.setOnMonthChangedListener(this);
+        //리사이클러뷰 띄어주기
+        setRecyclerView();
 
-        textView.setText("No Selection");
 
-        //파일 리사이클러뷰 처리
-        recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-
-        //newest to oldest order (database stores from oldest to newest)
-        llm.setReverseLayout(true);
-        llm.setStackFromEnd(true);
-
-        recyclerView.setLayoutManager(llm);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        mFileViewerAdapter = new FileViewerAdapter(this, llm);
-        recyclerView.setAdapter(mFileViewerAdapter);
 
         //백그라운드 서비스 처리
         /*
@@ -124,10 +130,29 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (serviceIntent!=null) {
-            stopService(serviceIntent);
-            serviceIntent = null;
+
+        if (isActivate){
+            if (RealService.serviceIntent==null) {
+                serviceIntent = new Intent(this, RealService.class);
+                serviceIntent.putExtra("isActive", isActivate);
+                startService(serviceIntent);
+            } else {
+                serviceIntent = RealService.serviceIntent;//getInstance().getApplication();
+                Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
+            }
+
+            if (serviceIntent!=null) {
+                stopService(serviceIntent);
+                serviceIntent = null;
+            }
+        }else{
+            Log.d("엥", "엥");
         }
+
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean("isActive", isActivate);
+        editor.commit();
     }
 
     @Override
@@ -164,4 +189,24 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             };
+
+    public void setRecyclerView(){
+        recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+
+        //newest to oldest order (database stores from oldest to newest)
+        llm.setReverseLayout(true);
+        llm.setStackFromEnd(true);
+
+        recyclerView.setLayoutManager(llm);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mFileViewerAdapter = new FileViewerAdapter(this, llm);
+        recyclerView.setAdapter(mFileViewerAdapter);
+    }
 }

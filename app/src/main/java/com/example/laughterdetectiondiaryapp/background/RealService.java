@@ -27,6 +27,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class RealService extends Service {
+
+    private boolean isActive;
     private Thread mainThread;
     public static Intent serviceIntent = null;
 
@@ -36,6 +38,7 @@ public class RealService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         serviceIntent = intent;
+        isActive = intent.getBooleanExtra("isActive", false);
         showToast(getApplication(), "Start Service");
 
         mainThread = new Thread(new Runnable() {
@@ -45,8 +48,9 @@ public class RealService extends Service {
                 boolean run = true;
                 while (run) {
                     try {
-                        Thread.sleep(1000 * 5 * 1); // 1 minute
+                        Thread.sleep(1000 * 1 * 1); // 1 minute
                         Date date = new Date();
+                        Log.d("나","돌아가는중");
                         //showToast(getApplication(), sdf.format(date));
                         sendNotification(sdf.format(date));
                     } catch (InterruptedException e) {
@@ -107,6 +111,7 @@ public class RealService extends Service {
         c.setTimeInMillis(System.currentTimeMillis());
         c.add(Calendar.SECOND, 1);
         Intent intent = new Intent(this, AlarmRecever.class);
+        intent.putExtra("isActive", isActive);
         PendingIntent sender = PendingIntent.getBroadcast(this, 0,intent,0);
 
         AlarmManager mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
