@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
 import android.app.Service;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,7 +16,10 @@ import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.PowerManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     TextView textView;
     RecyclerView recyclerView;
     Switch switchView;
+    ImageButton settingBtn;
 
     private Intent serviceIntent;
     private boolean isActivate;
@@ -58,6 +64,15 @@ public class MainActivity extends AppCompatActivity
         textView = (TextView)findViewById(R.id.textView);
         recyclerView =(RecyclerView) findViewById(R.id.recyclerView);
         switchView =(Switch) findViewById(R.id.activation_switch);
+        settingBtn = (ImageButton)findViewById(R.id.setting_btn);
+
+        settingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+                startActivity(intent);//액티비티 띄우기
+            }
+        });
 
         //달력처리
         widget.setOnDateChangedListener(this);
@@ -128,8 +143,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
 
         if (isActivate){
             if (RealService.serviceIntent==null) {
@@ -140,19 +155,42 @@ public class MainActivity extends AppCompatActivity
                 serviceIntent = RealService.serviceIntent;//getInstance().getApplication();
                 Toast.makeText(getApplicationContext(), "already", Toast.LENGTH_LONG).show();
             }
-
-            if (serviceIntent!=null) {
-                stopService(serviceIntent);
-                serviceIntent = null;
-            }
         }else{
-            Log.d("엥", "엥");
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (serviceIntent!=null) {
+            stopService(serviceIntent);
+            serviceIntent = null;
         }
 
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean("isActive", isActivate);
         editor.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Closing Activity")
+                .setMessage("Are you sure you want to close this activity?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     @Override

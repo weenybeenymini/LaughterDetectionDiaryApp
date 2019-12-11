@@ -22,11 +22,33 @@ import androidx.core.app.NotificationCompat;
 import com.example.laughterdetectiondiaryapp.R;
 import com.example.laughterdetectiondiaryapp.activity.MainActivity;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+
+import omrecorder.Recorder;
 
 public class RealService extends Service {
+
+    private static final String LOG_TAG = "RecordingService";
+
+    private Recorder recorder;
+
+
+    private String originFileName = null;
+
+    private String mFileName = null;
+    private String mFilePath = null;
+
+    private long now = 0;
+    private long mElapsedMillis = 0;
+    private static final SimpleDateFormat mTimerFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
+
+    private boolean first = true;
+
+    File f;
 
     private boolean isActive;
     private Thread mainThread;
