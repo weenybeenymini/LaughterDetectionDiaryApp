@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#FFB882</color>
+    <color name="primary">#F7C59F</color>
     <color name="primary_dark">#F2AF7C</color>
     <color name="primary_light">#FFD375</color>
     <color name="primary_text">#E8B36B</color>
-    <color name="accent">#FF8975</color>
-    <color name="secondary_text">#FF8975</color>
-    <color name="divider">#FF8975</color>
+    <color name="accent">#F2AF7C</color>
+    <color name="secondary_text">#E8B36B</color>
+    <color name="divider">#B42929</color>
     <color name="text">#E88F6B</color>
     <color name="white">#FFFFFF</color>
-    <color name="tab_strip">#B42929</color>
-    <color name="fabPrimary">#FF8975</color>
-    <color name="fabPressed">#E8B36B</color>
-    <color name="fabRipple">#FFB882</color>
 </resources>

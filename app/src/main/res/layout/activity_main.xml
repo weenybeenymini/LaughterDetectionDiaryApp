@@ -5,7 +5,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity"
+    android:background="@color/white">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="52dp"
+        android:background="@color/primary_dark" >
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="16dp"
+            android:text="웃자"
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
+        <ImageButton
+            android:id="@+id/setting_btn"
+            android:layout_width="80px"
+            android:layout_height="80px"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/ic_settings_white_24dp"
+            android:padding="0sp"
+            android:scaleType="centerCrop" />
+        <Switch
+            android:id="@+id/activation_switch"
+            android:switchMinWidth = "12dp"
+            android:showText="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/setting_btn"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendarView"
@@ -21,5 +57,10 @@
         android:layout_gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>
