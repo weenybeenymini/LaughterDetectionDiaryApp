@@ -18,7 +18,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.laughterdetectiondiaryapp.R;
 import com.example.laughterdetectiondiaryapp.RecordingItem;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.melnykov.fab.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +38,7 @@ public class PlaybackFragment extends DialogFragment {
     private MediaPlayer mMediaPlayer = null;
 
     private SeekBar mSeekBar = null;
-    private FloatingActionButton mPlayButton = null;
+    private com.melnykov.fab.FloatingActionButton mPlayButton = null;
     private TextView mCurrentProgressTextView = null;
     private TextView mFileNameTextView = null;
     private TextView mFileLengthTextView = null;
@@ -91,7 +91,7 @@ public class PlaybackFragment extends DialogFragment {
         ColorFilter filter = new LightingColorFilter
                 (getResources().getColor(R.color.primary), getResources().getColor(R.color.primary));
         mSeekBar.getProgressDrawable().setColorFilter(filter);
-        //mSeekBar.getThumb().setColorFilter(filter);
+        mSeekBar.getThumb().setColorFilter(filter);
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override

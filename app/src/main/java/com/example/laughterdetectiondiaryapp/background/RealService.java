@@ -116,7 +116,7 @@ public class RealService extends Service {
         setupRecorder();
         now = System.currentTimeMillis();
         recorder.startRecording();
-        Log.d("나","녹음다함 너 차례~!");
+        Log.d("나",mFileName + "이거 녹음했어");
     }
     private void stopRecoding(){
         Log.d("나","저장");
@@ -131,7 +131,7 @@ public class RealService extends Service {
         tFilePath = mFilePath;
         Message msg = handler.obtainMessage();
         handler.sendMessage(msg);
-        Log.d("나","저장다함 너 차례~!");
+        Log.d("나",tFileName + "이거저장해쏘");
     }
 
     final Handler handler = new Handler(){
